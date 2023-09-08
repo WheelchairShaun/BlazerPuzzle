@@ -1,5 +1,6 @@
 ﻿@page "/counter"
 @using System.Timers
+@implements IDisposable
 
 <PageTitle>Counter</PageTitle>
 
@@ -15,23 +16,28 @@
 
 @code {
 
-    private int currentCount = 0;
-    private int interval = 1;
-    private Timer timer;
-    private bool buttonDisabled = false;
+	private int currentCount = 0;
+	private int interval = 1;
+	private Timer timer;
+	private bool buttonDisabled = false;
 
-    private void IncrementCount()
-    {
-        currentCount++;
-        buttonDisabled = true;
-        timer = new Timer(TimeSpan.FromSeconds(interval));
-        timer.Elapsed += Timer_Elapsed;
-        timer.Start();
-    }
+	private void IncrementCount()
+	{
+		currentCount++;
+		buttonDisabled = true;
+		timer = new Timer(TimeSpan.FromSeconds(interval));
+		timer.Elapsed += Timer_Elapsed;
+		timer.Start();
+	}
 
-    private void Timer_Elapsed(object sender, ElapsedEventArgs e)
-    {
-        currentCount++;
-        StateHasChanged();
-    }   
+	private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+	{
+		currentCount++;
+		StateHasChanged();
+	}
+
+	void IDisposable.Dispose()
+	{
+		timer?.Dispose();
+	}
 }
