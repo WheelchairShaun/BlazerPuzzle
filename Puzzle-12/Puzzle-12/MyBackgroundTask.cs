@@ -12,54 +12,46 @@ namespace Puzzle_12;
 /// Is there a better way to implement a background task in a Blazor Server app?
 /// 
 /// </summary>
-public class MyBackgroundTask
+public class MyBackgroundTask : BackgroundService
 {
-    private CancellationTokenSource _cts = new CancellationTokenSource();
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+	{
+		await DoWorkAsync(stoppingToken);
+	}
 
-    public MyBackgroundTask()
-    {
-        // Start the background work immediately upon instantiation.
-        Task.Run(() => DoWork(_cts.Token));
-    }
+	private async Task DoWorkAsync(CancellationToken cancellationToken)
+	{
+		while (!cancellationToken.IsCancellationRequested)
+		{
+			try
+			{
+				// Perform the background task operation.
+				await ProcessDataAsync();
 
-    private async Task DoWork(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            try
-            {
-                // Perform the background task operation.
-                await ProcessDataAsync();
+				// Wait for a certain period before running again.
+				await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+			}
+			catch (TaskCanceledException)
+			{
+				// Ignore the task cancellation.
+			}
+			catch (Exception ex)
+			{
+				// Exception handling logic (potentially incomplete or incorrect).
+				LogError(ex);
+			}
+		}
+	}
 
-                // Wait for a certain period before running again.
-                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
-            }
-            catch (TaskCanceledException)
-            {
-                // Ignore the task cancellation.
-            }
-            catch (Exception ex)
-            {
-                // Exception handling logic (potentially incomplete or incorrect).
-                LogError(ex);
-            }
-        }
-    }
+	private async Task ProcessDataAsync()
+	{
+		// Processing logic goes here.
+		Debug.WriteLine($"Processing Data at {DateTime.Now.ToLongTimeString()}");
+	}
 
-    public void Stop()
-    {
-        _cts.Cancel();
-    }
-
-    private async Task ProcessDataAsync()
-    {
-        // Processing logic goes here.
-        Debug.WriteLine($"Processing Data at {DateTime.Now.ToLongTimeString()}");
-    }
-
-    private void LogError(Exception ex)
-    {
-        // Log the error (implementation omitted for brevity)
-    }
+	private void LogError(Exception ex)
+	{
+		// Log the error (implementation omitted for brevity)
+	}
 }
 
