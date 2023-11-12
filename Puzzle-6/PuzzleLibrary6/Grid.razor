@@ -1,7 +1,7 @@
 ﻿@using System.Reflection;
 @typeparam TItem
 <table>
-	<GridHeader HeaderType="@typeof(TItem)"></GridHeader>
+	<GridHeader HeaderType="@typeof(TItem)" HeaderClass="gridHeader"></GridHeader>
 	<tbody>
 
 		@if (Items is null)
